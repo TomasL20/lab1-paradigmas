@@ -94,3 +94,48 @@
       null
       )
   )
+
+(define a 1103515245)
+(define c 12345)
+(define m 2147483648)
+;
+;
+;
+(define myRandom
+  (lambda
+    (xn)
+    (remainder (+ (* a xn) c) m)
+  )
+)
+;
+;
+;
+(define (generateEnemigosRL E N M seed)
+  (let ([Y (remainder (myRandom (* seed 5)) M)]
+        [X (remainder (myRandom (* seed 4)) N)]
+       )
+    (if (= E 0)
+        null
+        (cons (personaje (cons X Y) 1 100 "E") (generateEnemigosRL (- E 1) E N M))        
+        )
+    )
+)
+;
+;
+;
+(define (generateTeamRL E N M seed)
+  (let ([B (remainder (myRandom (* seed 6)) M)]
+        [A (remainder (myRandom (* seed 7)) N)]
+       )
+    (if (= E 0)
+        null
+        (cons (personaje (cons A B) 0 100 "A") (generateTeamRL (- E 1) E N M))        
+        )
+    )
+)
+;
+;
+;
+(define (createScene N M E D seed)
+     (list "PLAYING" N M (list (generateEnemigosRL E N M seed)) (list (generateTeamRL E N M seed)))
+  )
