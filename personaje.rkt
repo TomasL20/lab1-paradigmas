@@ -137,5 +137,41 @@
 ;
 ;
 (define (createScene N M E D seed)
-     (list "PLAYING" N M (list (generateEnemigosRL E N M seed)) (list (generateTeamRL E N M seed)))
+     (list "PLAYING" N M (list (generateTeamRL E N M seed)) (list (generateEnemigosRL E N M seed)))
   )
+;
+;
+;
+(define (getTeam scene n) ; 0 para team y 1 para enemy 
+  (cadddr scene)
+  )
+;
+;
+;
+(define (getMember team member)
+  null
+  )
+(define (mover pj n k) ;0 para team y 1 para enemy 
+  null
+  )
+;
+;
+;
+(define (enemyRandom seed)
+  null)
+(define (stepsRandom seed)
+  null)
+(define (angleRandom seed)
+  null)
+(define S1 (createScene 40 60 3 1623748374))
+;
+;
+;
+(define (play S1)
+  (lambda (member) (lambda (move) (lambda (tf) (lambda (angle) (lambda (seed)
+                                                                 (tf (mover (getMember (getTeam (tf (mover (getMember (getTeam S1 0) member) move) angle) 1) (enemyRandom seed)) (stepsRandom seed)) (angleRandom seed))
+
+
+
+
+                                                                 ))))))
