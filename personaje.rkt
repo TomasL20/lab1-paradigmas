@@ -206,12 +206,12 @@
 ;
 ;
 (define (generateEnemigosRL E N M seed)
-  (let ([Y (remainder (myRandom (* seed 9)) M)]
-        [X (remainder (myRandom (* seed 6)) N)]
+  (let ([Y (remainder (myRandom (* seed 90)) M)]
+        [orientation (remainder (myRandom (* seed 3)) 359)]
        )
     (if (= E 0)
         null
-        (cons (personaje (cons X Y) 1 100 "E") (generateEnemigosRL (- E 1) E N M))        
+        (cons (personaje (cons (quotient N 2) Y) 1 100 "E") (generateEnemigosRL (- E 1) N M orientation))        
         )
     )
 )
@@ -219,12 +219,12 @@
 ;
 ;
 (define (generateTeamRL E N M seed)
-  (let ([B (remainder (myRandom (* seed 5)) M)]
-        [A (remainder (myRandom (* seed 8)) N)]
+  (let ([B (remainder (myRandom (* seed 26)) M)]
+        [orientation (remainder (myRandom (* seed 3)) 359)]
        )
     (if (= E 0)
         null
-        (cons (personaje (cons A B) 0 100 "A") (generateTeamRL (- E 1) E N M))        
+        (cons (personaje (cons (quotient N 2) B) 0 100 "A") (generateTeamRL (- E 1) N M orientation))        
         )
     )
 )
@@ -232,7 +232,7 @@
 ;
 ;
 (define (createScene N M E D seed)
-     (list "PLAYING" N M (list (generateTeamRL E N M seed)) (list (generateEnemigosRL E N M seed)))
+     (list "PLAYING" N M (generateTeamRL E N M seed) (generateEnemigosRL E N M seed))
   )
 ;
 ;
@@ -320,37 +320,32 @@
 
 
                                                                  ))))))
+
+;
+;
+;
+(define (comparar pos equipo)
+  (if (null? equipo)
+      #f
+      (if (equal? pos (getPosicion (car equipo)))
+          #t
+          (comparar pos (cdr equipo))
+          )
+      )
+  )
 ;
 ;
 ;
 (define (scene>string scene)
+  (define (generarString scene fila columna string)
+    (cond
+      [(> fila (getN scene)) string]
+      [(> columna (getM scene)) (generarString scene (+ fila 1) 0 (string-append string "\n"))]
+      [(comparar (cons fila columna) (getTeam scene 0)) (generarString scene fila (+ columna 1) (string-append string "A"))]
+      [(comparar (cons fila columna) (getTeam scene 1)) (generarString scene fila (+ columna 1) (string-append string "E"))]
+      [(> fila (getN scene)) (generarString scene fila (+ columna 1) (string-append string "#"))]
+      )
+    )
   (generarString scene 0 0 "")
   )
-;
-;
-;
-(define (buscar pos equipo1 equipo2)
-  (if (null? equipo1)
-      "#"
-      (if (equal? pos (getPosicion (car equipo1)))
-          "A"
-          (if (equal? pos (getPosicion (car equipo2)))
-              "E"
-              (buscar pos (cdr equipo1) (cdr equipo2))
-              )
-          )
-      )
-  )
-;
-;
-;
-(define (generarString scene fila columna string)
-  (if (> fila (getN scene))
-      string
-      (if (= columna (getM scene))
-          (generarString scene (+ fila 1) 0 (string-append string (buscar (cons fila columna) (getTeam scene 0) (getTeam scene 1))))
-          (generarString scene fila (+ columna 1) (string-append string (buscar (cons fila columna) (getTeam scene 0) (getTeam scene 1))))
-          )
-      )
-  )
-(define S2 (createScene 30 30 2 1 748357483))
+(define S2 (createScene 15 15 3 1 748357483))
