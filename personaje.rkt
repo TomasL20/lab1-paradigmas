@@ -237,24 +237,21 @@
 ;
 ;
 ;
-(define (compararPosiciones pj equipo2)
-  (if (null? equipo2)
+(define (verificarEquipo equipo1 equipo2)
+  (if (null? equipo1)
       #t
-      (if (eq? (car pj) (car equipo2))
+      (if (verificarPosicion (car (car equipo1)) equipo2)
+          (verificarEquipo (cdr equipo1) equipo2)
           #f
-          (compararPosiciones pj (cdr equipo2))
           )
       )
   )
-;
-;
-;
-(define (verificarEquipos equipo1 equipo2)
-  (if (null? equipo1)
+(define (verificarPosicion pos equipo2)
+  (if (null? equipo2)
       #t
-      (if (compararPosiciones (car equipo1) equipo2)
-          (verificarEquipos (cdr equipo1) equipo2)
+      (if (equal? pos (car (car equipo2)))
           #f
+          (verificarPosicion pos (cdr equipo2))
           )
       )
   )
@@ -264,7 +261,7 @@
 (define (checkScene scene)
   (if (and (list? scene) (= (length scene) 5))
       (if (and (string? (car scene)) (positive-integer? (cadr scene)) (positive-integer? (caddr scene)) (list? (cadddr scene)) (list? (last scene)))
-          (if (verificarEquipos (cadddr scene) (last scene))
+          (if (verificarEquipo (cadddr scene) (last scene))
               #t
               #f
               )
@@ -278,6 +275,18 @@
 ;
 (define (getState scene)
   (car scene)
+  )
+;
+;
+;
+(define (getN scene)
+  (cadr scene)
+  )
+;
+;
+;
+(define (getM scene)
+  (caddr scene)
   )
 ;
 ;
@@ -303,30 +312,45 @@
 ;
 ;
 ;
-(define (chooseEnemy seed)
-  null
-  )
-;
-;
-;
-(define (generateSteps seed)
-  null
-  )
-;
-;
-;
-(define (generateAngle seed)
-  null
-  )
-(define S1 (createScene 40 60 3 2 95967483273428364738974834783473897483948399)) ;escenario de prueba
-;
-;
-;
 (define (play scene)
   (lambda (member) (lambda (move) (lambda (tf) (lambda (angle) (lambda (seed)
-                                                                 (tf (setPosicionX (getMember (getTeam (tf (setPosicionX (getMember (getTeam S1 0) member) move) angle) 1) (chooseEnemy seed)) (generateSteps seed)) (generateAngle seed))
+                                                                 (tf (setPosicionX (getMember (getTeam (tf (setPosicionX (getMember (getTeam scene 0) member) move) angle) 1) 2) -3) 45)
 
 
 
 
                                                                  ))))))
+;
+;
+;
+(define (scene>string scene)
+  (generarString scene 0 0 "")
+  )
+;
+;
+;
+(define (buscar pos equipo1 equipo2)
+  (if (null? equipo1)
+      "#"
+      (if (equal? pos (getPosicion (car equipo1)))
+          "A"
+          (if (equal? pos (getPosicion (car equipo2)))
+              "E"
+              (buscar pos (cdr equipo1) (cdr equipo2))
+              )
+          )
+      )
+  )
+;
+;
+;
+(define (generarString scene fila columna string)
+  (if (> fila (getN scene))
+      string
+      (if (= columna (getM scene))
+          (generarString scene (+ fila 1) 0 (string-append string (buscar (cons fila columna) (getTeam scene 0) (getTeam scene 1))))
+          (generarString scene fila (+ columna 1) (string-append string (buscar (cons fila columna) (getTeam scene 0) (getTeam scene 1))))
+          )
+      )
+  )
+(define S2 (createScene 30 30 2 1 748357483))
