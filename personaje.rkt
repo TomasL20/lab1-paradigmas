@@ -317,11 +317,7 @@
 ;
 (define (play scene)
   (lambda (member) (lambda (move) (lambda (tf) (lambda (angle) (lambda (seed)
-                                                                 (tf (setPosicionY (getMember (getTeam (tf (setPosicionY (getMember (getTeam scene 0) member) move) angle) 1) 2) -3) 45)
-
-
-
-
+                                                                 (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) move 1 '()) 4 1 '())
                                                                  ))))))
 ;
 ;
@@ -371,11 +367,6 @@
     [else (setScene (cdr scene) equipo aux (+ contador 1) (append newScene (list (car scene))))]
     )
   )
-
-
-
-
-
 (define S1 (createScene 30 30 3 2 748357483))
 (define E1 (getTeam S1 0))
 (define P1 (setPosicionY (getMember E1 2) 3))
