@@ -70,9 +70,9 @@
 ;
 ;
 ;
-(define (setPosicionY pj y) ;sólo me moveré en X por mientras 
+(define (setPosicionY pj y)
   (if (personaje? pj)
-      (personaje (cons (car (getPosicion pj)) y) (getOrientacion pj) (getVida pj) (getName pj))
+      (personaje (cons (car (getPosicion pj)) (+ (cdr (getPosicion pj)) y)) (getOrientacion pj) (getVida pj) (getName pj))
       null
       )
   )
@@ -198,41 +198,41 @@
 ;
 (define myRandom
   (lambda
-    (xn)
+      (xn)
     (remainder (+ (* a xn) c) m)
+    )
   )
-)
 ;
 ;
 ;
 (define (generateEnemigosRL E N M seed)
-  (let ([Y (remainder (myRandom (* seed 90)) M)]
+  (let ([Y (remainder (myRandom (* seed 75)) M)]
         [orientation (remainder (myRandom (* seed 3)) 359)]
-       )
+        )
     (if (= E 0)
         null
         (cons (personaje (cons (quotient N 2) Y) 1 100 "E") (generateEnemigosRL (- E 1) N M orientation))        
         )
     )
-)
+  )
 ;
 ;
 ;
 (define (generateTeamRL E N M seed)
-  (let ([B (remainder (myRandom (* seed 26)) M)]
+  (let ([B (remainder (myRandom (* seed 7)) M)]
         [orientation (remainder (myRandom (* seed 3)) 359)]
-       )
+        )
     (if (= E 0)
         null
         (cons (personaje (cons (quotient N 2) B) 0 100 "A") (generateTeamRL (- E 1) N M orientation))        
         )
     )
-)
+  )
 ;
 ;
 ;
 (define (createScene N M E D seed)
-     (list "PLAYING" N M (generateTeamRL E N M seed) (generateEnemigosRL E N M seed))
+  (list "PLAYING" N M (generateTeamRL E N M seed) (generateEnemigosRL E N M seed))
   )
 ;
 ;
@@ -246,6 +246,9 @@
           )
       )
   )
+;
+;
+;
 (define (verificarPosicion pos equipo2)
   (if (null? equipo2)
       #t
@@ -295,7 +298,7 @@
   (if (= aux 0)
       (cadddr scene)
       (last scene)
-    )
+      )
   )
 ;
 ;
@@ -314,20 +317,19 @@
 ;
 (define (play scene)
   (lambda (member) (lambda (move) (lambda (tf) (lambda (angle) (lambda (seed)
-                                                                 (tf (setPosicionX (getMember (getTeam (tf (setPosicionX (getMember (getTeam scene 0) member) move) angle) 1) 2) -3) 45)
+                                                                 (tf (setPosicionY (getMember (getTeam (tf (setPosicionY (getMember (getTeam scene 0) member) move) angle) 1) 2) -3) 45)
 
 
 
 
                                                                  ))))))
-
 ;
 ;
 ;
 (define (comparar pos equipo)
   (if (null? equipo)
       #f
-      (if (equal? pos (getPosicion (car equipo)))
+      (if (equal? pos (car (car equipo)))
           #t
           (comparar pos (cdr equipo))
           )
@@ -343,9 +345,39 @@
       [(> columna (getM scene)) (generarString scene (+ fila 1) 0 (string-append string "\n"))]
       [(comparar (cons fila columna) (getTeam scene 0)) (generarString scene fila (+ columna 1) (string-append string "A"))]
       [(comparar (cons fila columna) (getTeam scene 1)) (generarString scene fila (+ columna 1) (string-append string "E"))]
-      [(> fila (getN scene)) (generarString scene fila (+ columna 1) (string-append string "#"))]
+      [(> fila (quotient (getN scene) 2)) (generarString scene fila (+ columna 1) (string-append string "#"))]
+      [else (generarString scene fila (+ columna 1) (string-append string "_"))]
       )
     )
   (generarString scene 0 0 "")
   )
-(define S2 (createScene 15 15 3 1 748357483))
+;
+;
+;
+(define (setEquipo pj equipo move aux lista)
+  (cond
+    [(null? equipo) lista]
+    [(= aux move) (setEquipo pj (cdr equipo) move (+ aux 1) (append lista (list pj)))]
+    [else (setEquipo pj (cdr equipo) move (+ aux 1) (append lista (list (car equipo))))]
+    )
+  )
+;
+;
+;
+(define (setScene scene equipo aux contador newScene)
+  (cond
+    [(null? scene) newScene]
+    [(= aux contador) (setScene (cdr scene) equipo aux (+ contador 1) (append newScene (list equipo)))]
+    [else (setScene (cdr scene) equipo aux (+ contador 1) (append newScene (list (car scene))))]
+    )
+  )
+
+
+
+
+
+(define S1 (createScene 30 30 3 2 748357483))
+(define E1 (getTeam S1 0))
+(define P1 (setPosicionY (getMember E1 2) 3))
+(define E2 (setEquipo P1 E1 2 1 '()))
+(define S2 (setScene S1 E2 4 1 '()))
