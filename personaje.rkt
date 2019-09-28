@@ -1,4 +1,5 @@
 #lang racket
+;TDA PERSONAJE
 ;
 ;
 ;
@@ -94,6 +95,7 @@
       null
       )
   )
+;TDA PROYECTIL 
 ;entrada : pair x number x number x number
 ;salida : TDA proyectil
 ;objetivo : construir el TDA proyectil
@@ -190,6 +192,7 @@
       null
       )
   )
+
 (define a 1103515245)
 (define c 12345)
 (define m 2147483648)
@@ -207,11 +210,11 @@
 ;
 (define (generateEnemigosRL E N M seed)
   (let ([Y (remainder (myRandom (* seed 75)) M)]
-        [orientation (remainder (myRandom (* seed 3)) 359)]
+        [aleatory (remainder (myRandom (* seed 3)) 359)]
         )
     (if (= E 0)
         null
-        (cons (personaje (cons (quotient N 2) Y) 1 100 "E") (generateEnemigosRL (- E 1) N M orientation))        
+        (cons (personaje (cons (quotient N 2) Y) 1 100 "E") (generateEnemigosRL (- E 1) N M aleatory))        
         )
     )
   )
@@ -220,11 +223,11 @@
 ;
 (define (generateTeamRL E N M seed)
   (let ([B (remainder (myRandom (* seed 7)) M)]
-        [orientation (remainder (myRandom (* seed 3)) 359)]
+        [aleatory (remainder (myRandom (* seed 3)) 359)]
         )
     (if (= E 0)
         null
-        (cons (personaje (cons (quotient N 2) B) 0 100 "A") (generateTeamRL (- E 1) N M orientation))        
+        (cons (personaje (cons (quotient N 2) B) 0 100 "A") (generateTeamRL (- E 1) N M aleatory))        
         )
     )
   )
@@ -317,11 +320,11 @@
 ;
 (define (play scene)
   (lambda (member) (lambda (move) (lambda (tf) (lambda (angle) (lambda (seed)
-                                                                 (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) move 1 '()) 4 1 '())
+                                                                 (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) tf (proyectil (cons 7 3) 50 30 20))
                                                                  ))))))
-;
-;
-;
+;entrada = pair x lista
+;salida = bool
+;objetivo = comprobar si una posición es igual a alguna posición de un personaje del equipo recibido
 (define (comparar pos equipo)
   (if (null? equipo)
       #f
@@ -331,9 +334,9 @@
           )
       )
   )
-;
-;
-;
+;entrada= lista 
+;salida= string
+;objetivo = representar el escenario como un string donde se puedan identificar los elementos del escenario 
 (define (scene>string scene)
   (define (generarString scene fila columna string)
     (cond
@@ -347,19 +350,19 @@
     )
   (generarString scene 0 0 "")
   )
-;
-;
-;
-(define (setEquipo pj equipo move aux lista)
+;entrada = personaje x lista x positive integer x positive integer x lista 
+;salida = lista
+;objetivo = actualizar la lista de aliados o enemigos después de haber realizado algún movimiento o de haber recibido un proyectil
+(define (setEquipo pj equipo member aux lista)
   (cond
     [(null? equipo) lista]
-    [(= aux move) (setEquipo pj (cdr equipo) move (+ aux 1) (append lista (list pj)))]
-    [else (setEquipo pj (cdr equipo) move (+ aux 1) (append lista (list (car equipo))))]
+    [(= aux member) (setEquipo pj (cdr equipo) member (+ aux 1) (append lista (list pj)))]
+    [else (setEquipo pj (cdr equipo) member (+ aux 1) (append lista (list (car equipo))))]
     )
   )
-;
-;
-;
+;entrada = lista x lista x positive integer x positive integer x lista
+;salida = lista 
+;objetivo = actualizar el escenario con la nueva lista actualizada de aliados o personajes 
 (define (setScene scene equipo aux contador newScene)
   (cond
     [(null? scene) newScene]
@@ -367,8 +370,28 @@
     [else (setScene (cdr scene) equipo aux (+ contador 1) (append newScene (list (car scene))))]
     )
   )
+
 (define S1 (createScene 30 30 3 2 748357483))
 (define E1 (getTeam S1 0))
 (define P1 (setPosicionY (getMember E1 2) 3))
 (define E2 (setEquipo P1 E1 2 1 '()))
 (define S2 (setScene S1 E2 4 1 '()))
+;
+;
+;
+(define (shoot scene posP projectile)
+  (cond
+    [(comparar posP (getTeam scene 0)) (setScene scene (setEquipo (setVida (car (findTarget posP (getTeam scene 0) 1)) (- (getVida (car (findTarget posP (getTeam scene 0) 1))) (getDamage projectile))) (getTeam scene 0) (cdr (findTarget posP (getTeam scene 0) 1)) 1 '()) 4 1 '())]
+    [(comparar posP (getTeam scene 1)) (setScene scene (setEquipo (setVida (car (findTarget posP (getTeam scene 1) 1)) (- (getVida (car (findTarget posP (getTeam scene 1) 1))) (getDamage projectile))) (getTeam scene 1) (cdr (findTarget posP (getTeam scene 1) 1)) 1 '()) 5 1 '())]
+    [else scene]
+    )
+  )
+;
+;
+;
+(define (findTarget posP equipo contador)
+  (if (equal? posP (getPosicion (car equipo)))
+      (cons (car equipo) contador)
+      (findTarget posP (cdr equipo) (+ contador 1))
+      )
+  )
