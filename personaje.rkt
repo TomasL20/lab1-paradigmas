@@ -173,6 +173,15 @@
       null
       )
   )
+;
+;
+;
+(define (setXY p coord)
+  (if (proyectil? p)
+      (proyectil (car coord) (cdr coord) (getAngle p) (getSpeed p) (getDamage p))
+      null
+      )
+  )
 ;entrada : proyectil x number 
 ;salida : proyectil 
 ;objetivo : modificar el ángulo de lanzamiento del proyectil
@@ -431,22 +440,28 @@
 ;objetivo = ejecutar el turno del jugador y del enemigo 
 (define (play scene)
   (lambda (member) (lambda (move) (lambda (tf) (lambda (angle) (lambda (seed)
-                                                                 (turnoE (setScene (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed)) (cons (setProjectiles (setXY (selectProjectil (car (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed)))) member 1) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed)) (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed))) member 0 1) (cdr (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed))))) 6 1 '())  member move tf angle seed)
+                                                                 (turnoE (setScene (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed 0)) (cons (setProjectiles (setXY (selectProjectil (car (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed 0)))) member 1) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed 0)) (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed 0))) member 0 1) (cdr (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 0 0 seed 0))))) 6 1 '())  member (* -1 move) tf angle seed)
                                                                  ))))))
 ;entrada = escenario x entero x entero x tf x entero x entero
 ;salida = escenario
 ;objetivo = ejecutar el turno del enemigo 
 (define (turnoE scene member move tf angle seed)
-  (setScene (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) (cons (car (getProjectiles scene)) (setProjectiles (setXY (selectProjectil (cdr (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) member angle 0 1 seed))
-  )) member 1) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) member angle 0 1 seed)) (getProjectiles scene) member 1 1)) 6 1 '())
+  (setScene (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) (cons (car (getProjectiles scene)) (setProjectiles (setXY (selectProjectil (cdr (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) member angle 0 1 seed 0))
+  )) member 1) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) member angle 0 1 seed 0)) (getProjectiles scene) member 1 1)) 6 1 '())
   )
 ;entrada = escenario x entero x entero x tf x entero x entero
 ;salida =  lista infinita de escenarios
 ;objetivos = poder ver el escenario cada cierto tiempo t  
 (define (playLazy scene member move tf t angle seed)
-  null
+  (cons (turnoELazy (setScene (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 1 0 seed t)) (cons (setProjectiles (setXY (selectProjectil (car (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 1 0 seed t)))) member 1) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 1 0 seed t)) (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 1 0 seed t))) member 0 1) (cdr (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 0) member) move) (getTeam scene 0) member 1 '()) 4 1 '()) member angle 1 0 seed t))))) 6 1 '())  member (* -1 move) tf angle seed t) (lazy (playLazy scene member move tf (+ t t) angle seed)))
   )
-(define S1 (createScene 30 30 3 2 748357483))
+;entrada = escenario x entero x entero x tf x entero x entero x entero
+;salida = escenario
+;objetivo = ejecutar el turno de la CPU en modo playLazy
+(define (turnoELazy scene member move tf angle seed t)
+  (setScene (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) (cons (car (getProjectiles scene)) (setProjectiles (setXY (selectProjectil (cdr (getProjectiles (shoot (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) member angle 1 1 seed t))
+  )) member 1) (tf (setScene scene (setEquipo (setPosicionY (getMember (getTeam scene 1) member) move) (getTeam scene 1) member 1 '()) 5 1 '()) member angle 1 1 seed t)) (getProjectiles scene) member 1 1)) 6 1 '())
+  )
 ;entrada = entero
 ;salida = entero
 ;objetivo = generar un ángulo en radianes entre 0 y 90°
@@ -456,12 +471,12 @@
 ;entrada = escenario x entero x entero x entero x entero x entero
 ;salida = pair
 ;objetivo = generar el punto de impacto del proyectil o generar el punto del proyectil en un tiempo t
-(define (tf scene member angle aux1 aux2 seed)
+(define (tf scene member angle aux1 aux2 seed t)
    (cond
      [(and (= aux1 0) (= aux2 0)) (cons (car (getPosition (selectProjectil (car (getProjectiles scene)) member 1))) (+ (floor (/ (* (sin (* (* angle (/ pi 180)) 2)) (expt 30 2)) 9.81)) (cdr (getPosition (selectProjectil (cdr (getProjectiles scene)) member 1)))))] ;modo play y no aleatorio
-     [(and (= aux1 0) (= aux2 1)) (cons (car (getPosition (selectProjectil (cdr (getProjectiles scene)) member 1))) (+ (floor (/ (* (sin (* (angleAleatory seed) 2)) (expt 30 2)) 9.81)) (cdr (getPosition (selectProjectil (cdr (getProjectiles scene)) member 1)))))] ;modo play y aleatorio
-     [(and (= aux1 1) (= aux2 0))] ; modo playLazy y no aleatorio
-     ; modo playLazy y aleatorio 
+     [(and (= aux1 0) (= aux2 1)) (cons (car (getPosition (selectProjectil (cdr (getProjectiles scene)) member 1))) (+ (floor (/ (* (sin (* (angleAleatory seed) 2)) (* -1 (expt 30 2))) 9.81)) (cdr (getPosition (selectProjectil (cdr (getProjectiles scene)) member 1)))))] ;modo play y aleatorio
+     [(and (= aux1 1) (= aux2 0)) (cons (+ (floor (/ (* (expt t 2) 9.81) 2)) (cdr (getPosition (selectProjectil (car (getProjectiles scene)) member 1))) (* (sin angle) t (getSpeed (selectProjectil (car (getProjectiles scene)) member 1)))) (+ (car (getPosition (selectProjectil (car (getProjectiles scene)) member 1))) (* t (cos angle) (getSpeed (selectProjectil (car (getProjectiles scene)) member 1)))))]; modo playLazy y no aleatorio
+     [(and (= aux1 1) (= aux2 1)) (cons (+ (floor (/ (* (expt t 2) 9.81) 2)) (cdr (getPosition (selectProjectil (car (getProjectiles scene)) member 1))) (* (sin (angleAleatory seed)) t (getSpeed (selectProjectil (car (getProjectiles scene)) member 1)))) (+ (car (getPosition (selectProjectil (car (getProjectiles scene)) member 1))) (* t (cos (angleAleatory seed)) (getSpeed (selectProjectil (car (getProjectiles scene)) member 1)))))]; modo playLazy y aleatorio 
      )
   )
 ;entrada = lista de personajes x lista de personajes
@@ -502,12 +517,4 @@
           )
       )
   )
-;
-;
-;
-(define (setXY p coord)
-  (if (proyectil? p)
-      (proyectil (car coord) (cdr coord) (getAngle p) (getSpeed p) (getDamage p))
-      null
-      )
-  )
+(define S1 (createScene 30 30 3 2 748357483))
